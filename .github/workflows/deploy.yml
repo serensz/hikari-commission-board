@@ -28,8 +28,13 @@ jobs:
           cache: 'npm' # change to 'yarn' or 'pnpm' if using them
       - name: Install dependencies
         run: npm install
+        
       - name: Build project
         run: npm run build
+        # 🔥 This is the missing piece! It passes your secret to Vite:
+        env:
+          VITE_PUBLIC_GIST_ID: ${{ secrets.VITE_PUBLIC_GIST_ID }}
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
