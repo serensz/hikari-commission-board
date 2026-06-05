@@ -6,7 +6,7 @@ import { GAMES, TASK_LABELS, STATUS_OPTIONS } from './gamedata';
 import { parseURL, navigate } from './router';
 import { renderPublicHome, renderPublicLookup, renderPublicQueue } from './public-ui';
 import { renderAdminSetup, renderAdminSettings, renderPublishModal } from './admin-ui';
-import { loadGistConfig, saveGistConfig, testGistAuth, fetchPublicQueue } from './gist';
+import { loadGistConfig, saveGistConfig, testGistAuth, fetchPublicQueue, PUBLIC_GIST_ID } from './gist';
 // STATE
 let state = loadState();
 let adminTab = 'clients';
@@ -15,6 +15,9 @@ let filterStatus = 'All';
 let searchQuery = '';
 let gistUsername, gistEmail;
 let publicClients = [], publicSearchQuery = '', publicLoading = false, publicError;
+// GLOBAL HANDLERS FOR PUBLIC UI
+window.lookupSelectClient = (id) => navigate('public-lookup', { id });
+window.queueSelectClient = (id) => navigate('public-lookup', { id });
 // HELPERS
 function statusClass(s) {
     return { Pending: 'status-pending', 'In Progress': 'status-inprog', Done: 'status-done', 'On Hold': 'status-hold' }[s];
@@ -84,8 +87,16 @@ async function renderPublicPage(route) {
     let pageContent = '';
     if (route.page === 'public-home')
         pageContent = renderPublicHome();
-    else if (route.page === 'public-lookup')
-        pageContent = renderPublicLookup(publicClients, null, publicSearchQuery, publicLoading);
+    else if (route.page === 'public-lookup') {
+        await loadPublicQueue();
+        const selectedId = route.params.id;
+        const selected = selectedId ? publicClients.find(c => c.id === selectedId) : null;
+        const filtered = publicClients.filter(c => !publicSearchQuery ||
+            c.name.toLowerCase().includes(publicSearchQuery.toLowerCase()) ||
+            c.contact.toLowerCase().includes(publicSearchQuery.toLowerCase()) ||
+            c.id.toLowerCase().includes(publicSearchQuery.toLowerCase()));
+        pageContent = renderPublicLookup(filtered, selected || null, publicSearchQuery, publicLoading);
+    }
     else if (route.page === 'public-queue') {
         await loadPublicQueue();
         pageContent = renderPublicQueue(publicClients, publicLoading, publicError);
@@ -149,12 +160,15 @@ async function loadPublicQueue() {
     publicLoading = true;
     publicError = undefined;
     try {
-        const config = loadGistConfig();
-        if (!config?.gistId)
-            throw new Error('Queue not published yet');
-        const queueData = await fetchPublicQueue(config.gistId);
+        if (!PUBLIC_GIST_ID)
+            throw new Error('Admin has not linked the public queue ID yet.');
+        const queueData = await fetchPublicQueue(PUBLIC_GIST_ID);
         publicClients = queueData.clients;
         publicLoading = false;
+        const ts = document.getElementById('queueLastUpdated');
+        if (ts && queueData.lastUpdated) {
+            ts.textContent = new Date(queueData.lastUpdated).toLocaleString('en-GB');
+        }
     }
     catch (err) {
         publicError = err instanceof Error ? err.message : 'Failed to load queue';
@@ -187,10 +201,20 @@ function attachEventListeners() {
     document.getElementById('addClientBtn')?.addEventListener('click', () => showClientModal());
     document.querySelectorAll('.edit-client-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const id = e.target.getAttribute('data-client-id');
+            const id = e.currentTarget.getAttribute('data-client-id');
             const client = state.clients.find(c => c.id === id);
             if (client)
                 showClientModal(client);
+        });
+    });
+    document.querySelectorAll('.delete-client-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-client-id');
+            if (id && confirm('Are you sure you want to delete this client?')) {
+                state.clients = state.clients.filter(c => c.id !== id);
+                saveState(state);
+                router();
+            }
         });
     });
     // Publish queue
@@ -226,6 +250,9 @@ function attachEventListeners() {
         status.textContent = '⏳ Testing...';
         try {
             const user = await testGistAuth(token);
+            if (user.username !== 'serensz') {
+                throw new Error('Unauthorized: This dashboard is restricted.');
+            }
             saveGistConfig({ token });
             gistUsername = user.username;
             gistEmail = user.email;
@@ -242,7 +269,7 @@ function attachEventListeners() {
     });
     // Skip Setup
     document.getElementById('skipSetupBtn')?.addEventListener('click', () => {
-        saveGistConfig({ token: '' }); // Save empty config to allow dashboard access
+        saveGistConfig({ token: '' });
         navigate('admin-dashboard');
     });
     // Navigation
@@ -315,7 +342,21 @@ function showClientModal(client) {
         router();
     });
 }
+// INITIALIZATION
+async function init() {
+    const config = loadGistConfig();
+    if (config?.token) {
+        try {
+            const user = await testGistAuth(config.token);
+            gistUsername = user.username;
+            gistEmail = user.email;
+        }
+        catch (e) {
+            console.warn('GitHub session could not be restored automatically.');
+        }
+    }
+    router();
+}
 // INIT
 window.addEventListener('hashchange', router);
-router();
-router();
+init();

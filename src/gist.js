@@ -1,3 +1,5 @@
+// 🔥 Add your Gist ID here once you generate it
+export const PUBLIC_GIST_ID = import.meta.env.VITE_PUBLIC_GIST_ID || '';
 const GIST_FILENAME = 'gameboost_queue.json';
 // ── Local Storage for Gist Config ────────────────────────────
 const GIST_KEY = 'gameboost_gist_config';
@@ -21,7 +23,7 @@ export async function createGist(token, data) {
     const response = await fetch('https://api.github.com/gists', {
         method: 'POST',
         headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -45,7 +47,7 @@ export async function updateGist(token, gistId, data) {
     const response = await fetch(`https://api.github.com/gists/${gistId}`, {
         method: 'PATCH',
         headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -62,20 +64,18 @@ export async function updateGist(token, gistId, data) {
     }
 }
 export async function fetchPublicQueue(gistId) {
-    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-        headers: { 'Accept': 'application/vnd.github.v3.raw' }
-    });
+    const response = await fetch(`https://api.github.com/gists/${gistId}`);
     if (!response.ok) {
         throw new Error('Failed to fetch public queue');
     }
-    const content = await response.text();
-    const file = JSON.parse(content);
-    return file;
+    const gistData = await response.json();
+    const fileContent = gistData.files[GIST_FILENAME].content;
+    return JSON.parse(fileContent);
 }
 export async function testGistAuth(token) {
     const response = await fetch('https://api.github.com/user', {
         headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/vnd.github.v3+json'
         }
     });
