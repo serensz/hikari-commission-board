@@ -1,5 +1,8 @@
 import type { Client } from './types'
 
+// 🔥 Add your Gist ID here once you generate it
+export const PUBLIC_GIST_ID = '' 
+
 export interface GistConfig {
   token: string
   gistId?: string
@@ -38,7 +41,7 @@ export async function createGist(token: string, data: PublicQueueData): Promise<
   const response = await fetch('https://api.github.com/gists', {
     method: 'POST',
     headers: {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -65,7 +68,7 @@ export async function updateGist(token: string, gistId: string, data: PublicQueu
   const response = await fetch(`https://api.github.com/gists/${gistId}`, {
     method: 'PATCH',
     headers: {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -84,24 +87,22 @@ export async function updateGist(token: string, gistId: string, data: PublicQueu
 }
 
 export async function fetchPublicQueue(gistId: string): Promise<PublicQueueData> {
-  const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-    headers: { 'Accept': 'application/vnd.github.v3.raw' }
-  })
+  const response = await fetch(`https://api.github.com/gists/${gistId}`)
 
   if (!response.ok) {
     throw new Error('Failed to fetch public queue')
   }
 
-  const content = await response.text()
-  const file = JSON.parse(content)
+  const gistData = await response.json()
+  const fileContent = gistData.files[GIST_FILENAME].content
   
-  return file as PublicQueueData
+  return JSON.parse(fileContent) as PublicQueueData
 }
 
 export async function testGistAuth(token: string): Promise<{ username: string; email?: string }> {
   const response = await fetch('https://api.github.com/user', {
     headers: {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json'
     }
   })
