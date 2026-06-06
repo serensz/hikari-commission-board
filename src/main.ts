@@ -4,7 +4,7 @@ import type { Client, AppState, Game, Status, TaskSet, IncomeEntry } from './typ
 import { loadState, saveState, uid, syncClientsToGist } from './storage'
 import { GAMES, TASK_LABELS, STATUS_OPTIONS } from './gamedata'
 import { parseURL, navigate, type RouterState } from './router'
-import { renderPublicHome, renderPublicLookup, renderPublicQueue } from './public-ui'
+import { renderPublicHome, renderPublicLookup, renderPublicQueue, renderPublicInfo } from './public-ui'
 import { renderAdminSetup, renderAdminSettings, renderPublishModal } from './admin-ui'
 import { loadGistConfig, saveGistConfig, testGistAuth, fetchPublicQueue, PUBLIC_GIST_ID } from './gist'
 
@@ -49,12 +49,12 @@ async function router() {
 async function renderAdminPage(route: RouterState) {
   const app = document.getElementById('app')!
   if (route.page === 'admin-setup') {
-    app.innerHTML = `<div class="header"><div class="header-left"><div class="logo">✨ Hikari's Commission Board</div><div class="tagline">Admin Setup</div></div></div><div class="main-content">${renderAdminSetup()}</div>`
+    app.innerHTML = `<div class="header"><div class="header-left"><a href="#public-home" class="logo" style="text-decoration: none; cursor: pointer;">✨ Hikari's Commission Board</a><div class="tagline">Admin Setup</div></div></div><div class="main-content">${renderAdminSetup()}</div>`
   } else {
     const config = loadGistConfig()
     if (config === null) { navigate('admin-setup'); return }
     app.innerHTML = `
-      <div class="header"><div class="header-left"><div class="logo">✨ Hikari's Commission Board</div><div class="tagline">Admin</div></div><div class="header-right"><button class="btn btn-ghost btn-sm" id="navPublicBtn">👁 View Public</button><button class="btn btn-primary btn-sm" id="publishQueueBtn">📤 Publish Queue</button></div></div>
+      <div class="header"><div class="header-left"><a href="#public-home" class="logo" style="text-decoration: none; cursor: pointer;">✨ Hikari's Commission Board</a><div class="tagline">Admin</div></div><div class="header-right"><button class="btn btn-ghost btn-sm" id="navPublicBtn">👁 View Public</button><button class="btn btn-primary btn-sm" id="publishQueueBtn">📤 Publish Queue</button></div></div>
       <div class="tab-nav"><button class="tab-btn ${adminTab === 'clients' ? 'active' : ''}" data-tab="clients">👥 Clients</button><button class="tab-btn ${adminTab === 'income' ? 'active' : ''}" data-tab="income">💰 Income</button><button class="tab-btn ${adminTab === 'stats' ? 'active' : ''}" data-tab="stats">📊 Stats</button><button class="tab-btn ${adminTab === 'settings' ? 'active' : ''}" data-tab="settings">⚙️ Settings</button></div>
       <div class="main-content">${adminTab === 'clients' ? renderAdminClients() : adminTab === 'income' ? renderAdminIncome() : adminTab === 'stats' ? renderAdminStats() : renderAdminSettings(gistUsername, gistEmail, loadGistConfig()?.gistId)}</div>
     `
@@ -65,17 +65,35 @@ async function renderAdminPage(route: RouterState) {
 async function renderPublicPage(route: RouterState) {
   const app = document.getElementById('app')!
   let pageContent = ''
-  if (route.page === 'public-home') pageContent = renderPublicHome()
-  else if (route.page === 'public-lookup') {
+  
+  if (route.page === 'public-home') {
+    pageContent = renderPublicHome()
+  } else if (route.page === 'public-info') {
+    pageContent = renderPublicInfo() 
+  } else if (route.page === 'public-lookup') {
     await loadPublicQueue()
     const selectedId = route.params.id
     const selected = selectedId ? publicClients.find(c => c.id === selectedId) : null
     
     // Initial render includes ALL clients. We filter via DOM later.
     pageContent = renderPublicLookup(publicClients, selected || null, publicSearchQuery, publicLoading)
-  } else if (route.page === 'public-queue') { await loadPublicQueue(); pageContent = renderPublicQueue(publicClients, publicLoading, publicError) }
+  } else if (route.page === 'public-queue') { 
+    await loadPublicQueue()
+    pageContent = renderPublicQueue(publicClients, publicLoading, publicError) 
+  }
+
   app.innerHTML = `
-    <div class="header"><div class="header-left"><div class="logo">✨ Hikari's Commission Board</div><div class="tagline">Public Queue</div></div><div class="header-right"><a href="#admin-setup" class="btn btn-ghost btn-sm">🔐 Admin</a></div></div>
+    <div class="header">
+      <div class="header-left">
+        <!-- 🔥 Changed the logo to a clickable link -->
+        <a href="#public-home" class="logo" style="text-decoration: none; cursor: pointer;">✨ Hikari's Commission Board</a>
+        <div class="tagline">Public Queue</div>
+      </div>
+      <div class="header-right">
+        <a href="#public-info" class="btn btn-ghost btn-sm">📜 Info</a>
+        <a href="#admin-setup" class="btn btn-ghost btn-sm">🔐 Admin</a>
+      </div>
+    </div>
     <div class="main-content">${pageContent}</div>
   `
 }

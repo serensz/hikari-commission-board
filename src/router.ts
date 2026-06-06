@@ -1,7 +1,7 @@
 // ── Router ─────────────────────────────────────────────────────────
 // Simple URL-based router for admin/public pages
 
-export type PageType = 'admin-dashboard' | 'admin-setup' | 'public-home' | 'public-lookup' | 'public-queue'
+export type PageType = 'admin-dashboard' | 'admin-setup' | 'public-home' | 'public-lookup' | 'public-queue' | 'public-info'
 
 export interface RouterState {
   page: PageType

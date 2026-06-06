@@ -5,13 +5,13 @@ export function renderPublicHome(): string {
   return `
   <div class="landing-page">
     <div class="landing-hero">
-      <!-- Main site banner (e.g., your logo or a large wide image) -->
       <img src="/banner.png" alt="Hikari's Commission Board" class="landing-banner" onerror="this.style.display='none'">
       <h1 class="landing-title">✨ Hikari's Commission Board</h1>
       <p class="landing-subtitle">Professional Boosting & Maintenance Services</p>
       
       <div class="landing-buttons">
         <a href="#public-lookup" class="btn btn-primary btn-lg">🔍 Track My Order</a>
+        <a href="#public-info" class="btn btn-primary btn-lg" style="background: var(--bg3); color: var(--text1); border: 1px solid var(--border);">📜 Info & Services</a>
         <a href="#public-queue" class="btn btn-ghost btn-lg">📋 View Live Queue</a>
       </div>
     </div>
@@ -200,3 +200,91 @@ function formatDate(d: string): string { if (!d) return '—'; const dt = new Da
 function daysLeftValue(deadline: string): string { if (!deadline) return '—'; const diff = Math.ceil((new Date(deadline).getTime() - Date.now()) / 86400000); if (diff < 0) return `${Math.abs(diff)}d overdue`; if (diff === 0) return 'Due today'; return `${diff}d left` }
 function getDeadlineClass(deadline: string): string { if (!deadline) return ''; const diff = Math.ceil((new Date(deadline).getTime() - Date.now()) / 86400000); if (diff < 0) return 'overdue'; if (diff === 0) return 'due-today'; if (diff <= 3) return 'due-soon'; return 'due-ok' }
 function escapeHtml(text: string): string { const div = document.createElement('div'); div.textContent = text; return div.innerHTML }
+
+export function renderPublicInfo(): string {
+  return `
+  <div class="public-page">
+    <div class="info-header" style="text-align: center; margin-bottom: 3rem;">
+      <h1 class="landing-title" style="font-size: 2.2rem;">🎮 Commission Services</h1>
+      <p style="color: var(--text2); max-width: 600px; margin: 0 auto 1rem; line-height: 1.6;">
+        Fast, reliable, and played live on stream upon request.<br>
+        <strong style="color: var(--accent-red);">Note:</strong> No Currency farming.
+      </p>
+    </div>
+
+    <div class="services-grid">
+      <!-- Wuthering Waves -->
+      <div class="service-card" style="border-top: 4px solid ${GAMES['WuWa'].accent}">
+        <div class="service-card-header">
+          <img src="${GAMES['WuWa'].logo}" class="game-logo-lg" onerror="this.style.display='none'">
+          <h2>Wuthering Waves</h2>
+        </div>
+        <ul class="service-list">
+          <li>Daily / Weekly / Monthly commissions</li>
+          <li>Map exploration <span class="sub-text">(% based, story quests priced separately)</span></li>
+          <li>Events & main story progression</li>
+          <li>Endgame content (ToA / WhiWa) <span class="sub-text">— best effort, live if requested</span></li>
+        </ul>
+      </div>
+
+      <!-- Honkai: Star Rail -->
+      <div class="service-card" style="border-top: 4px solid ${GAMES['HSR'].accent}">
+        <div class="service-card-header">
+          <img src="${GAMES['HSR'].logo}" class="game-logo-lg" onerror="this.style.display='none'">
+          <h2>Honkai: Star Rail</h2>
+        </div>
+        <ul class="service-list">
+          <li>Daily / Monthly tasks</li>
+          <li>Chest farming & map clearing</li>
+          <li>Events & main story progression</li>
+          <li>Simulated Universe / Currency Wars <span class="sub-text">— full 100% collection</span></li>
+          <li>MOC / PF / AS / AA <span class="sub-text">— best effort, live if requested</span></li>
+        </ul>
+      </div>
+
+      <!-- Zenless Zone Zero -->
+      <div class="service-card" style="border-top: 4px solid ${GAMES['ZZZ'].accent}">
+        <div class="service-card-header">
+          <img src="${GAMES['ZZZ'].logo}" class="game-logo-lg" onerror="this.style.display='none'">
+          <h2>Zenless Zone Zero</h2>
+        </div>
+        <ul class="service-list">
+          <li>Daily / Weekly / Monthly tasks</li>
+          <li>Events & main story progression</li>
+          <li>Hollow Zero & other permanent modes</li>
+          <li>Shiyu Defense / Deadly Assault <span class="sub-text">— best effort, Top 1% leaderboard exp.</span></li>
+        </ul>
+      </div>
+
+      <!-- Arknights: Endfield -->
+      <div class="service-card" style="border-top: 4px solid ${GAMES['Endfield'].accent}">
+        <div class="service-card-header">
+          <img src="${GAMES['Endfield'].logo}" class="game-logo-lg" onerror="this.style.display='none'">
+          <h2>Arknights: Endfield</h2>
+        </div>
+        <ul class="service-list">
+          <li>Daily / Weekly / Monthly tasks</li>
+          <li>Events & main story progression</li>
+          <li>Map exploration <span class="sub-text">(story quests priced separately)</span></li>
+          <li>Etchspace clearing</li>
+          <li>Factory & Pylon layout optimization <span class="sub-text">— strong Yield output guaranteed</span></li>
+          <li>Umbral Monument / Endgame <span class="sub-text">— experienced with all comps, live if requested</span></li>
+          <li>CC <span class="sub-text">(coming soon)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Other Services & Footer -->
+    <div class="other-services-section" style="margin-top: 3rem; background: var(--bg2); padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="margin-bottom: 1rem; color: var(--accent-cyan);">🌟 Other Games & Services</h3>
+      <ul class="service-list" style="margin-bottom: 1.5rem;">
+        <li><strong>Arknights (Main):</strong> Former 100% Collector / multiple seasons of CC High Score clears. Available on a case-by-case basis depending on account state.</li>
+        <li><strong>Other Games:</strong> Feel free to ask. Will take requests for games I've played.</li>
+      </ul>
+      <div style="padding: 1rem; background: rgba(56, 199, 244, 0.1); border-radius: 8px; border-left: 4px solid var(--accent-cyan);">
+        <strong>💡 Free consultation</strong> on gameplay & account building available for any game. Just ask!
+      </div>
+    </div>
+  </div>
+  `
+}
