@@ -335,40 +335,82 @@ function showIncomeModal(entry?: IncomeEntry) {
   })
 }
 
-// CLIENT MODAL
+// CLIENT MODAL (Now with Auto-Linked Income!)
 function showClientModal(client?: Client) {
   const c: Client = client || { id: uid(), name: '', contact: '', game: 'WuWa', startDate: '', deadline: '', package: '', status: 'Pending', progress: 0, tasks: { daily: false, weekly: false, monthly: false, story: false, special: false, endgame: false }, notes: '', createdAt: Date.now() }
+  
+  // Find linked income if it exists
+  const linkedIncome = state.income.find(inc => inc.clientId === c.id)
+  const currentPrice = linkedIncome ? linkedIncome.amount : 0
+  const isPaid = linkedIncome ? linkedIncome.paid : false
+
   const div = document.createElement('div')
   div.innerHTML = `
     <div class="modal-overlay" id="clientModal">
-      <div class="modal"><div class="modal-header"><h2>${client ? '✏️ Edit Client' : '➕ New Client'}</h2><button class="modal-close" id="closeClientModal">✕</button></div>
+      <div class="modal"><div class="modal-header"><h2>${client ? '✏️ Edit Client & Payment' : '➕ New Client & Payment'}</h2><button class="modal-close" id="closeClientModal">✕</button></div>
       <div class="modal-body">
         <div class="form-grid">
           <div class="form-group"><label>Client Name *</label><input type="text" id="f_name" value="${c.name}" placeholder="e.g. Client001"></div>
           <div class="form-group"><label>Contact</label><input type="text" id="f_contact" value="${c.contact}" placeholder="@discord"></div>
+          
           <div class="form-group"><label>Game *</label><select id="f_game">${(['WuWa', 'HSR', 'ZZZ', 'Endfield'] as Game[]).map(g => `<option value="${g}" ${c.game === g ? 'selected' : ''}>${GAMES[g].emoji} ${g}</option>`).join('')}</select></div>
           <div class="form-group"><label>Status</label><select id="f_status">${STATUS_OPTIONS.map(s => `<option value="${s}" ${c.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+          
+          <div class="form-group"><label>Package / Service</label><input type="text" id="f_package" value="${c.package}" placeholder="e.g. Full Clear"></div>
+          <div class="form-group"><label>Progress %</label><div style="display: flex; align-items: center; gap: 0.6rem;"><input type="range" id="f_progress" class="range-input" min="0" max="100" value="${c.progress}" style="--pct: ${c.progress}%;"><span id="progressValue" style="font-weight: 700; min-width: 3rem;">${c.progress}</span></div></div>
+
           <div class="form-group"><label>Start Date</label><input type="date" id="f_startDate" value="${c.startDate}"></div>
           <div class="form-group"><label>Deadline</label><input type="date" id="f_deadline" value="${c.deadline}"></div>
-          <div class="form-group"><label>Package</label><input type="text" id="f_package" value="${c.package}" placeholder="e.g. Full Clear"></div>
-          <div class="form-group"><label>Progress %</label><div style="display: flex; align-items: center; gap: 0.6rem;"><input type="range" id="f_progress" class="range-input" min="0" max="100" value="${c.progress}" style="--pct: ${c.progress}%;"><span id="progressValue" style="font-weight: 700; min-width: 3rem;">${c.progress}</span></div></div>
+          
+          <!-- 🔥 NEW: Integrated Financials -->
+          <div class="form-group" style="background: var(--bg3); padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <label style="color: var(--accent-cyan);">Price (THB)</label>
+            <input type="number" id="f_price" value="${currentPrice}" placeholder="0" style="margin-top: 0.5rem; background: var(--bg2);">
+          </div>
+          <div class="form-group" style="background: var(--bg3); padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; justify-content: center; flex-direction: column;">
+            <label style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Payment Status</label>
+            <label class="check-label" style="background: var(--bg2);"><input type="checkbox" id="f_paid" ${isPaid ? 'checked' : ''}> ✓ Mark as Paid</label>
+          </div>
+
           <div class="form-group full"><label>Tasks</label><div class="task-checks">${Object.keys(c.tasks).map(k => `<label class="check-label"><input type="checkbox" name="task_${k}" ${(c.tasks as any)[k] ? 'checked' : ''}>${TASK_LABELS[k]}</label>`).join('')}</div></div>
           <div class="form-group full"><label>Notes</label><textarea id="f_notes" placeholder="Notes..." style="height: 80px;">${c.notes}</textarea></div>
         </div>
       </div>
-      <div class="modal-footer"><button class="btn btn-ghost" id="closeClientModalBtn">Cancel</button><button class="btn btn-primary" id="saveClientBtn">Save</button></div></div>
+      <div class="modal-footer"><button class="btn btn-ghost" id="closeClientModalBtn">Cancel</button><button class="btn btn-primary" id="saveClientBtn">Save Client</button></div></div>
     </div>
   `
   document.getElementById('app')!.appendChild(div)
+  
+  // Progress Bar visual update
   const prg = document.getElementById('f_progress') as HTMLInputElement
   if (prg) prg.addEventListener('input', () => { (prg as any).style.setProperty('--pct', prg.value + '%'); (document.getElementById('progressValue') as any).textContent = prg.value })
+  
+  // 🔥 SMART AUTOMATION: If Status changes to "Done", auto-check the Paid box!
+  const statusSelect = document.getElementById('f_status') as HTMLSelectElement
+  const paidCheck = document.getElementById('f_paid') as HTMLInputElement
+  if (statusSelect && paidCheck) {
+    statusSelect.addEventListener('change', (e) => {
+      if ((e.target as HTMLSelectElement).value === 'Done') {
+        paidCheck.checked = true;
+        prg.value = '100'; // Bonus: Auto-set progress to 100% when done!
+        (prg as any).style.setProperty('--pct', '100%');
+        (document.getElementById('progressValue') as any).textContent = '100';
+      } else {
+        paidCheck.checked = false;
+      }
+    })
+  }
+
   document.getElementById('closeClientModal')?.addEventListener('click', () => div.remove())
   document.getElementById('closeClientModalBtn')?.addEventListener('click', () => div.remove())
+  
   document.getElementById('saveClientBtn')?.addEventListener('click', () => {
     const name = (document.getElementById('f_name') as HTMLInputElement)?.value.trim()
     if (!name) { alert('Name required'); return }
-    const updated: Client = {
-      id: client?.id || uid(),
+    
+    // 1. Save Client Data
+    const updatedClient: Client = {
+      id: c.id,
       name,
       contact: (document.getElementById('f_contact') as HTMLInputElement)?.value,
       game: (document.getElementById('f_game') as HTMLSelectElement)?.value as Game,
@@ -386,10 +428,36 @@ function showClientModal(client?: Client) {
         endgame: (document.querySelector('[name="task_endgame"]') as HTMLInputElement)?.checked || false,
       },
       notes: (document.getElementById('f_notes') as HTMLTextAreaElement)?.value,
-      createdAt: client?.createdAt || Date.now(),
+      createdAt: c.createdAt,
     }
-    if (client) state.clients = state.clients.map(c => c.id === updated.id ? updated : c)
-    else state.clients.push(updated)
+
+    if (client) state.clients = state.clients.map(cl => cl.id === updatedClient.id ? updatedClient : cl)
+    else state.clients.push(updatedClient)
+
+    // 2. Auto-Sync Income Data
+    const price = parseFloat((document.getElementById('f_price') as HTMLInputElement)?.value || '0')
+    const isNowPaid = paidCheck.checked
+
+    if (price > 0 || linkedIncome) {
+      const incObj: IncomeEntry = {
+        id: linkedIncome?.id || uid(),
+        clientId: updatedClient.id,
+        clientName: updatedClient.name,
+        game: updatedClient.game,
+        service: updatedClient.package || 'Custom Boosting',
+        amount: price,
+        paid: isNowPaid,
+        month: linkedIncome?.month || new Date().toISOString().slice(0, 7),
+        notes: ''
+      }
+      
+      if (linkedIncome) {
+        state.income = state.income.map(i => i.id === incObj.id ? incObj : i)
+      } else {
+        state.income.push(incObj)
+      }
+    }
+
     saveState(state); div.remove(); router()
   })
 }
