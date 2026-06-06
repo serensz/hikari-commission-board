@@ -2,16 +2,26 @@
 
 /* ── Variables ───────────────────────────────────────────────── */
 :root {
-  --bg:        #0D0D14;
-  --bg2:       #141420;
-  --bg3:       #1C1C2E;
-  --bg4:       #252538;
-  --border:    #2E2E48;
-  --text:      #E0E0F0;
-  --text2:     #9090B0;
-  --text3:     #5A5A7A;
-  --accent:    #7C6EFA;
-  --accent2:   #9D8FFF;
+  /* Deep purplish-black backgrounds (Her outfit/straps) */
+  --bg:        #110E17;
+  --bg2:       #1A1625;
+  --bg3:       #241E33;
+  --bg4:       #2E2642;
+  --border:    #3D3356;
+  
+  /* Soft pink-tinted text */
+  --text:      #FDFBFF;
+  --text2:     #D6CDE6;
+  --text3:     #9B8DAE;
+  
+  /* Main Pink Accents (Hair) */
+  --accent:    #F28EB0;
+  --accent2:   #FBC2D4;
+  
+  /* Extra Palette Accents (Eyes, Jewels, Gloves) */
+  --accent-cyan: #38C7F4;
+  --accent-red:  #D12643;
+  
   --radius:    10px;
   --radius-sm: 6px;
   --shadow:    0 4px 20px rgba(0,0,0,0.5);
@@ -146,24 +156,36 @@ html, body {
 
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: #110E17; /* Dark text for high contrast on the pink button */
   border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(242, 142, 176, 0.25);
 }
-.btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+.btn-primary:hover { 
+  background: var(--accent2); 
+  border-color: var(--accent2); 
+  box-shadow: 0 6px 16px rgba(242, 142, 176, 0.4);
+}
 
 .btn-ghost {
   background: transparent;
   color: var(--text2);
   border-color: var(--border);
 }
-.btn-ghost:hover { color: var(--text); border-color: var(--text3); }
+.btn-ghost:hover { 
+  color: var(--accent-cyan); 
+  border-color: var(--accent-cyan); 
+  background: rgba(56, 199, 244, 0.08); /* Faint cyan glow */
+}
 
 .btn-danger {
   background: transparent;
-  color: #EF5350;
-  border-color: #EF535040;
+  color: var(--accent-red);
+  border-color: rgba(209, 38, 67, 0.3);
 }
-.btn-danger:hover { background: #EF535020; }
+.btn-danger:hover { 
+  background: rgba(209, 38, 67, 0.15); 
+  border-color: var(--accent-red); 
+}
 
 .btn-sm { font-size: 0.8rem; padding: 0.35rem 0.8rem; }
 
@@ -1471,6 +1493,264 @@ html, body {
   font-family: var(--font-mono);
 }
 
+/* --- New UX/UI Improvements --- */
+
+/* Hero Banner */
+.hero-banner {
+  width: 100%;
+  max-width: 600px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* Game Logos */
+.game-logo-sm {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.game-logo-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Fix flex wrapping on client cards */
+.client-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Polish the Income Table */
+.income-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.income-table th, .income-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.income-table th {
+  color: var(--text2);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.amount-cell {
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text1);
+}
+
+.paid-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.paid-yes { background: #4CAF5020; color: #4CAF50; }
+.paid-no { background: #EF535020; color: #EF5350; }
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+.btn-icon:hover { opacity: 1; transform: scale(1.1); }
+
+/* --- Gateway Landing Page --- */
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.landing-banner {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  /* Blend the pink and cyan for the title */
+  background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-subtitle {
+  color: var(--text2);
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.landing-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+}
+
+.landing-games-section {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.landing-games-section h2 {
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  color: var(--text1);
+}
+
+.landing-games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.landing-game-card {
+  background: var(--bg2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+}
+
+.landing-char-img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  object-position: top center;
+  border-bottom: 1px solid var(--border);
+}
+
+.landing-game-content {
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.landing-game-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-game-brand h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text1);
+}
+
+.landing-logo-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.landing-game-tasks {
+  color: var(--text3);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Make cards feel like floating paper instead of rigid boxes */
+.client-card, .queue-card, .settings-section, .stat-card {
+  border: none !important;
+  background: var(--bg2);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15); /* Softer shadow */
+  padding: 1.5rem !important;
+}
+
+/* Typography polish */
+h1, h2, h3 {
+  font-family: var(--font-header);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Softer inputs */
+.search-input {
+  border-radius: 999px; /* Pill-shaped inputs feel friendlier */
+  padding: 0.75rem 1.5rem;
+  background: var(--bg3);
+}
+
+/* Humanized Income Styles */
+.income-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.income-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--bg2);
+  border-radius: var(--radius);
+  transition: transform 0.2s;
+}
+
+.income-row:hover { background: var(--bg3); }
+
+.income-info { display: flex; flex-direction: column; gap: 0.2rem; }
+.income-info strong { font-size: 1rem; color: var(--text); }
+.income-meta { font-size: 0.8rem; color: var(--text3); }
+
+.income-amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.income-amount.paid { color: var(--accent-cyan); }
+.income-amount.unpaid { color: var(--accent-red); }
+
+.income-actions { display: flex; gap: 0.5rem; }
 /* ── Mobile ──────────────────────────────────────────────────– */
 @media (max-width: 600px) {
   .main-content { padding: 1rem; }

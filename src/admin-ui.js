@@ -3,7 +3,7 @@ export function renderAdminSetup() {
   <div class="admin-setup">
     <div class="setup-card">
       <div class="setup-icon">🔐</div>
-      <h1>GitHub Configuration</h1>
+      <h1>Hikari's Commission Board</h1>
       <p>Setup GitHub Gist API to sync your queue with public viewers</p>
 
       <div class="setup-form">
