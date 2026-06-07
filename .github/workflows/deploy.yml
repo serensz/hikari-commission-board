@@ -29,11 +29,10 @@ jobs:
       - name: Install dependencies
         run: npm install
         
-      - name: Build project
+      - name: Build
         run: npm run build
-        # 🔥 This is the missing piece! It passes your secret to Vite:
         env:
-          VITE_PUBLIC_GIST_ID: ${{ secrets.VITE_PUBLIC_GIST_ID }}
+          VITE_GIST_ID: ${{ secrets.VITE_GIST_ID }}
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

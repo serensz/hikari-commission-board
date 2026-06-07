@@ -1,8 +1,9 @@
 /// <reference types="vite/client" />
 import type { Client } from './types'
 
+
 // 🔥 Add your Gist ID here once you generate it
-export const PUBLIC_GIST_ID = import.meta.env.VITE_PUBLIC_GIST_ID || ''
+export const PUBLIC_GIST_ID = import.meta.env.VITE_GIST_ID || '531d9ed429fb44e8a2336d68d58266eb'
 
 export interface GistConfig {
   token: string
