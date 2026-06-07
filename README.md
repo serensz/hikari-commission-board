@@ -1,40 +1,65 @@
-# 🎮 GameBoost Tracker
+# ✨ Hikari's Commission Board
 
-Client progress tracker for WuWa, HSR, ZZZ, and Endfield boosting services.
+A professional, boutique-style client commission and progress tracking platform designed for account maintenance and boosting services. It features a secure private admin dashboard and a real-time public queue for clients to seamlessly track their orders.
 
-## Features
-- **Clients tab** — Add/edit/delete clients with game, status, progress %, deadline, and per-task checkboxes
-- **Income tab** — Track payment per client with paid/unpaid status and THB totals
-- **Stats tab** — Visual breakdown by game and status
-- **Persistent** — All data saved in browser `localStorage`
-- **Export / Import** — Backup and restore data as JSON
+## 🌟 Features
 
-## Local Dev
+* **Public Tracking Gateway:** Clients can view a read-only queue, view service details, and search for their specific order status using a clean, modern landing page.
+* **Private Admin Dashboard:** Full control over client orders, statuses, deadlines, and per-game task checklists.
+* **Integrated Income Tracking:** Financials are automatically linked to client cards. Marking a job as "Done" instantly updates your paid/unpaid income ledger and calculates total revenue.
+* **Live Synchronization:** Uses the GitHub Gist API to seamlessly sync the private admin state with the public-facing viewer—no traditional backend database required.
+* **Boutique UI/UX:** A premium, human-centric design featuring a custom color palette, soft glass-morphism, responsive DOM filtering, and modern typography.
+* **Supported Games:** Native tracking and icon support for *Wuthering Waves*, *Honkai: Star Rail*, *Zenless Zone Zero*, and *Arknights: Endfield*.
 
+## 🚀 Local Development
+
+1. Clone the repository and install dependencies:
 ```bash
-npm install
-npm run dev
+   npm install
+```
+2. Create a .env file in the root directory so Vite can read your Gist ID locally:
+```VITE_PUBLIC_GIST_ID=your_gist_id_here
+```
+3. Start the development server:
+```npm run dev
 ```
 
-## Deploy to GitHub Pages (Auto)
+🌐 Deployment (GitHub Pages)
+This project is configured to automatically deploy to GitHub Pages using GitHub Actions.
 
-1. Push this repo to GitHub (any repo name)
-2. Go to **Settings → Pages**
-3. Set **Source** to `GitHub Actions`
-4. Push to `main` — the workflow builds and deploys automatically
+1. Set Up Your Gist Secret
+For the public queue to sync properly, GitHub Actions needs your Gist ID:
 
-Your site will be live at:
-`https://<your-username>.github.io/<repo-name>/`
+Go to your repository Settings → Secrets and variables → Actions.
 
-## Manual Deploy (alternative)
+Click New repository secret.
 
-```bash
-npm install
-npm run build
-# then upload the /dist folder to any static host
-```
+Name: VITE_PUBLIC_GIST_ID
 
-## Tech Stack
-- **Vanilla TypeScript** + **Vite** — zero framework, fast, easy to maintain
-- No external dependencies at runtime
-- Single-page app, all state in localStorage
+Secret: Paste your 32-character Gist ID (e.g., 549aec6e7b6f789e789b8b247205fa32).
+
+2. Enable GitHub Pages
+Go to repository Settings → Pages.
+
+Set the Source dropdown to GitHub Actions.
+
+3. Deploy
+Simply commit and push your code to the main branch.
+
+The GitHub Action workflow will automatically build the Vite project, inject your secret ID, and publish the live site.
+
+📁 Project Structure
+/src — Contains all TypeScript logic, UI rendering, routing, and custom CSS.
+
+/public — Contains static assets, game logos, and character hero banners.
+
+/.github/workflows — Contains deploy.yml for CI/CD automation.
+
+🛠️ Tech Stack
+Frontend: Vanilla TypeScript + Vite
+
+Styling: Custom CSS with CSS Variables
+
+State Management: Browser localStorage (Admin) + GitHub Gist API (Public Sync)
+
+Hosting: GitHub Pages
